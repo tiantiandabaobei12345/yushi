@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A jade product item",
+      "type": "object",
+      "properties": {
+        "name_zh": { "type": "string", "description": "Chinese name" },
+        "name_en": { "type": "string", "description": "English name" },
+        "description_zh": { "type": "string", "description": "Chinese description" },
+        "description_en": { "type": "string", "description": "English description" },
+        "material_zh": { "type": "string", "description": "Chinese material" },
+        "material_en": { "type": "string", "description": "English material" },
+        "origin_zh": { "type": "string", "description": "Chinese origin" },
+        "origin_en": { "type": "string", "description": "English origin" },
+        "dimensions": { "type": "string", "description": "Product dimensions" },
+        "price": { "type": "number", "description": "Price in CNY" },
+        "category": { "type": "string", "description": "Product category" },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "Array of image URLs" },
+        "video": { "type": "string", "description": "Video URL" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name_zh", "category", "price"]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Public user profile and favorites",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "favorites": { "type": "array", "items": { "type": "string" } },
+        "isAdmin": { "type": "boolean" }
+      },
+      "required": ["userId", "email"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of jade products"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and settings"
+    }
+  }
+}

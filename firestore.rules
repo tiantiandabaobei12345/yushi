@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name_zh', 'category', 'price']) &&
+             data.name_zh is string && data.name_zh.size() <= 200 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && isOwner(userId) && 
+                      (!request.resource.data.keys().contains('isAdmin') || request.resource.data.isAdmin == false);
+      allow update: if isOwner(userId) && 
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['favorites', 'email']) || isAdmin());
+    }
+
+    match /products/{productId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && isValidProduct(request.resource.data);
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}
