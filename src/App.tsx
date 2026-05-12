@@ -15,8 +15,6 @@ import { Navbar } from '@/components/Navbar';
 import { Toaster } from '@/components/ui/sonner';
 import Home from '@/pages/Home';
 import Gallery from '@/pages/Gallery';
-import Profile from '@/pages/Profile';
-import AdminDashboard from '@/pages/AdminDashboard';
 import ProductDetail from '@/pages/ProductDetail';
 import About from '@/pages/About';
 
@@ -31,8 +29,6 @@ export default function App() {
               <Route path="/" element={<Home />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/about" element={<About />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/product/:id" element={<ProductDetail />} />
             </Routes>
           </main>

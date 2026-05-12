@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '../hooks/useProducts';
-import { useAuth } from '../hooks/useAuth';
 import { Product } from '../types';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
   Select, 
@@ -13,16 +11,12 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, SlidersHorizontal, Heart, Eye } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { db } from '../services/firebase';
-import { toast } from 'sonner';
 
 const Gallery: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { products, loading } = useProducts();
-  const { profile, user } = useAuth();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -41,22 +35,6 @@ const Gallery: React.FC = () => {
     if (selectedSort === 'price-desc') return b.price - a.price;
     return 0; // Default to newest (already sorted in hook)
   });
-
-  const toggleFavorite = async (productId: string, isFavorited: boolean) => {
-    if (!user) {
-      toast.error('Please login to save favorites');
-      return;
-    }
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        favorites: isFavorited ? arrayRemove(productId) : arrayUnion(productId)
-      });
-      toast.success(isFavorited ? 'Removed from collections' : 'Added to collections');
-    } catch (error) {
-      toast.error('Operation failed');
-    }
-  };
 
   return (
     <div className="bg-brand-beige min-h-screen pb-24">
@@ -139,7 +117,6 @@ const Gallery: React.FC = () => {
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20"
             >
               {filteredProducts.map((product) => {
-                const isFavorited = profile?.favorites?.includes(product.id) || false;
                 const name = i18n.language === 'zh' ? product.name_zh : product.name_en;
                 const material = i18n.language === 'zh' ? product.material_zh : product.material_en;
 
@@ -163,19 +140,6 @@ const Gallery: React.FC = () => {
                         />
                       </Link>
                       
-                      <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
-                        <button 
-                          onClick={() => toggleFavorite(product.id, isFavorited)}
-                          className={`p-3 rounded-full backdrop-blur-md transition-all ${
-                            isFavorited 
-                              ? 'bg-brand-jade text-white' 
-                              : 'bg-white/50 hover:bg-white text-brand-dark/60 hover:text-red-500'
-                          }`}
-                        >
-                          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
-                        </button>
-                      </div>
-
                       <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
 

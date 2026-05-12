@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Product } from '../types';
-import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, ChevronLeft, ChevronRight, Share2, Info, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Share2, Info, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { profile, user } = useAuth();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,33 +40,15 @@ const ProductDetail: React.FC = () => {
     fetchProduct();
   }, [id, navigate]);
 
-  const isFavorited = profile?.favorites?.includes(id || '') || false;
-
-  const toggleFavorite = async () => {
-    if (!user || !id) {
-      toast.error('Please login to save favorites');
-      return;
-    }
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        favorites: isFavorited ? arrayRemove(id) : arrayUnion(id)
-      });
-      toast.success(isFavorited ? 'Removed from collection' : 'Added to collection');
-    } catch (error) {
-      toast.error('Operation failed');
-    }
-  };
-
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-24 animate-pulse">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div className="aspect-square bg-white" />
+          <div className="aspect-square bg-brand-greige" />
           <div className="space-y-8">
-            <div className="h-12 bg-white w-3/4" />
-            <div className="h-6 bg-white w-1/4" />
-            <div className="h-32 bg-white w-full" />
+            <div className="h-12 bg-brand-greige w-3/4" />
+            <div className="h-6 bg-brand-greige w-1/4" />
+            <div className="h-32 bg-brand-greige w-full" />
           </div>
         </div>
       </div>
@@ -193,18 +171,9 @@ const ProductDetail: React.FC = () => {
                 Enquire for Bespoke Order
               </Button>
               <div className="flex gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={toggleFavorite}
-                  className={`flex-1 py-10 rounded-none border-brand-border text-[10px] uppercase tracking-widest font-bold transition-all h-auto ${
-                    isFavorited ? 'bg-brand-jade text-white border-brand-jade' : 'hover:bg-brand-dark hover:text-white'
-                  }`}
-                >
-                  <Heart className={`mr-2 h-4 w-4 ${isFavorited ? 'fill-current' : ''}`} />
-                  {isFavorited ? 'In Collection' : 'Add to Collection'}
-                </Button>
-                <Button variant="outline" className="px-8 rounded-none border-brand-border hover:bg-brand-dark hover:text-white transition-all">
-                  <Share2 className="h-4 w-4" />
+                <Button variant="outline" className="w-full py-10 rounded-none border-brand-border hover:bg-brand-dark hover:text-white transition-all h-auto">
+                   <Share2 className="mr-2 h-4 w-4" />
+                   Share This Piece
                 </Button>
               </div>
             </div>

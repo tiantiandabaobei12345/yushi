@@ -1,21 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth';
-import { logout } from '../services/firebase';
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Globe, User as UserIcon, Menu, LogOut, Settings } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Globe, Menu } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { user, isAdmin } = useAuth();
-  const navigate = useNavigate();
 
   const toggleLanguage = () => {
     const nextLng = i18n.language === 'zh' ? 'en' : 'zh';
@@ -51,48 +41,6 @@ export const Navbar: React.FC = () => {
               CN
             </button>
           </div>
-
-          <div className="h-4 w-px bg-brand-border hidden sm:block"></div>
-
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt="User" className="h-8 w-8 rounded-full" referrerPolicy="no-referrer" />
-                  ) : (
-                    <UserIcon className="h-5 w-5" />
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-brand-beige border-brand-border">
-                <DropdownMenuItem className="font-medium">{user.displayName || user.email}</DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">{t('nav.profile')}</Link>
-                </DropdownMenuItem>
-                {isAdmin && (
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin" className="cursor-pointer flex items-center gap-2">
-                      <Settings className="h-4 w-4" />
-                      {t('nav.admin')}
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={logout} className="text-red-600 cursor-pointer flex items-center gap-2">
-                  <LogOut className="h-4 w-4" />
-                  {t('nav.logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button 
-              onClick={() => navigate('/profile')}
-              variant="ghost"
-              className="text-[10px] tracking-widest font-bold uppercase hover:bg-transparent p-0"
-            >
-              {t('nav.login')}
-            </Button>
-          )}
 
           <div className="md:hidden">
             <Menu className="h-5 w-5 opacity-60" />
